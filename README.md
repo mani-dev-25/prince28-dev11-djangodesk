@@ -10,7 +10,8 @@ Python web developer at a Coimbatore startup whose Django admin pages became slo
 
 ## The problem
 
-Django's ORM hides SQL, so N+1 queries and missing indexes go unnoticed. Docs are large and version-specific.
+Django's ORM lets you write Python instead of SQL, but it hides the queries it runs. If you read order.customer.name inside a loop, Django fires one extra query for every row. This is called an N+1 query problem. An admin page showing 500 orders can end up making 1,500 queries and nobody notices until the page becomes slow. The official docs explain the fix, but they are huge and change between versions, so finding the right answer takes time.
+
 
 ## Data sources
 
