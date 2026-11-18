@@ -3,7 +3,7 @@
   {
     "id": "001",
     "page": "ref/models/querysets",
-    "topic": "select_related follows foreign keys with a JOIN",
+    "topic": "select_related follows foreign keys using SQL JOIN",
     "django_version": "5.2",
     "api_name": "QuerySet.select_related",
     "orm_method": "select_related",
