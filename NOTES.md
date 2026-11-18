@@ -1,0 +1,92 @@
+
+# Engineering Notes — DjangoDesk
+
+## D03 — PostgreSQL
+
+### 1. Migration verification
+
+Commands used:
+
+```powershell
+uv run alembic downgrade -1
+uv run alembic current
+uv run alembic upgrade head
+uv run alembic history
+```
+
+Paste the actual terminal output here.
+
+Current migration head: `22cdb59bd522`
+
+### 2. Loader idempotency
+
+First run:
+
+```text
+records=5 inserted=5 updated=0 unchanged=0
+```
+
+Second run:
+
+```text
+records=5 inserted=0 updated=0 unchanged=5
+```
+
+The second run did not insert duplicate records. This confirms idempotency.
+
+**Data note:** The available `data/sample_records.json` contains 5 records. The task mentions 20 records, but the other 15 were not available in the provided project data.
+
+### 3. PostgreSQL GIN index — EXPLAIN ANALYZE
+
+Query:
+
+```sql
+EXPLAIN ANALYZE
+SELECT id, title
+FROM documents
+WHERE metadata @> CAST(:f AS jsonb);
+```
+
+Filter:
+
+```json
+{"page": "ref/models/querysets"}
+```
+
+Normal query plan:
+
+```text
+Seq Scan on documents  (cost=0.00..11.00 rows=1 width=36) (actual time=0.012..0.014 rows=3.00 loops=1)
+  Filter: (metadata @> '{"page": "ref/models/querysets"}'::jsonb)
+  Rows Removed by Filter: 2
+  Buffers: shared hit=1
+Planning:
+  Buffers: shared hit=148 read=1
+Planning Time: 1.255 ms
+Execution Time: 0.036 ms
+```
+
+With sequential scans disabled:
+
+```text
+Bitmap Heap Scan on documents  (cost=12.81..16.82 rows=1 width=36) (actual time=0.851..0.853 rows=3.00 loops=1)
+  Recheck Cond: (metadata @> '{"page": "ref/models/querysets"}'::jsonb)
+  Heap Blocks: exact=1
+  Buffers: shared hit=3 read=1
+  ->  Bitmap Index Scan on ix_documents_metadata_gin  (cost=0.00..12.81 rows=1 width=0) (actual time=0.819..0.819 rows=4.00 loops=1)
+        Index Cond: (metadata @> '{"page": "ref/models/querysets"}'::jsonb)
+        Index Searches: 1
+        Buffers: shared hit=2 read=1
+Planning:
+  Buffers: shared hit=1
+Planning Time: 0.092 ms
+Execution Time: 0.898 ms
+```
+
+### 4. Why did PostgreSQL choose a Seq Scan?
+
+The table contains only 5 documents. Scanning a small table is cheaper than accessing an index.
+
+### 5. When would PostgreSQL use the GIN index?
+
+When the table becomes larger and the query planner estimates that using the GIN index is cheaper than scanning the entire table.

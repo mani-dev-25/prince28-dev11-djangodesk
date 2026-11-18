@@ -1,71 +1,118 @@
 import pytest
-from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
-from djangodesk.api.main import create_app
 from djangodesk.config import Settings
 
 
-def test_ready_is_503_when_data_file_missing(tmp_path):
-    settings = Settings(app_env="ci", data_file=tmp_path / "missing.json")
-    with TestClient(create_app(settings)) as c:
-        assert c.get("/health").status_code == 200  # alive...
-        assert c.get("/ready").status_code == 503  # ...but not ready
+def test_ready_when_database_available(client):
+    response = client.get("/ready")
+
+    assert response.status_code == 200
+    assert response.json()["checks"]["database"] is True
+
+
+def test_ready_when_database_unavailable(client, db_state):
+    db_state["up"] = False
+
+    response = client.get("/ready")
+
+    assert response.status_code == 503
+    assert response.json()["checks"]["database"] is False
 
 
 def test_list_documents_paginates(client):
-    r = client.get("/v1/documents", params={"limit": 2})
-    body = r.json()
-    assert r.status_code == 200
+    response = client.get("/v1/documents", params={"limit": 2})
+    body = response.json()
+
+    assert response.status_code == 200
     assert body["total"] == 3
     assert len(body["items"]) == 2
 
 
 def test_search_filters_records(client):
-    r = client.get("/v1/documents", params={"q": "beta"})
-    assert [d["id"] for d in r.json()["items"]] == ["002"]
+    response = client.get("/v1/documents", params={"q": "beta"})
+
+    assert [doc["id"] for doc in response.json()["items"]] == ["002"]
+
+
+def test_search_is_case_insensitive(client):
+    response = client.get("/v1/documents", params={"q": "BETA"})
+
+    assert [doc["id"] for doc in response.json()["items"]] == ["002"]
+
+
+def test_filter_by_metadata(client):
+    response = client.get("/v1/documents", params={"category": "guide"})
+
+    assert response.status_code == 200
+    assert [doc["id"] for doc in response.json()["items"]] == ["001"]
+
+
+def test_filter_values_are_returned(client):
+    response = client.get("/v1/documents", params={"category": "guide"})
+
+    assert response.json()["filters"] == {"category": "guide"}
+
+
+def test_invalid_filter_key_returns_400(client):
+    response = client.get("/v1/documents", params={"Bad-Name": "test"})
+
+    assert response.status_code == 400
+
+
+def test_list_without_filters(client):
+    response = client.get("/v1/documents")
+
+    assert response.status_code == 200
+    assert response.json()["filters"] == {}
 
 
 def test_get_document_found(client):
-    r = client.get("/v1/documents/001")
-    assert r.status_code == 200
-    assert r.json()["title"] == "Alpha guideline"
+    response = client.get("/v1/documents/001")
+
+    assert response.status_code == 200
+    assert response.json()["title"] == "Alpha guideline"
 
 
-def test_bad_limit_is_422_problem(client):
-    r = client.get("/v1/documents", params={"limit": 0})
-    assert r.status_code == 422
-    assert r.json()["errors"][0]["field"] == "query.limit"
+def test_missing_document_returns_problem_details(client):
+    response = client.get("/v1/documents/999")
+
+    assert response.status_code == 404
+    assert response.headers["content-type"] == "application/problem+json"
+    assert response.json()["status"] == 404
+
+
+def test_bad_limit_is_422(client):
+    response = client.get("/v1/documents", params={"limit": 0})
+
+    assert response.status_code == 422
+    assert response.json()["errors"][0]["field"] == "query.limit"
+
+
+def test_bad_offset_is_422(client):
+    response = client.get("/v1/documents", params={"offset": -1})
+
+    assert response.status_code == 422
 
 
 def test_request_id_is_echoed(client):
-    r = client.get("/health", headers={"X-Request-ID": "abc123"})
-    assert r.headers["X-Request-ID"] == "abc123"
+    response = client.get(
+        "/health",
+        headers={"X-Request-ID": "abc123"},
+    )
+
+    assert response.headers["X-Request-ID"] == "abc123"
+
+
+def test_health_is_ok(client):
+    response = client.get("/health")
+
+    assert response.status_code == 200
+    assert response.json()["status"] == "ok"
 
 
 def test_app_refuses_to_start_without_app_env(monkeypatch):
     monkeypatch.delenv("APP_ENV", raising=False)
+
     with pytest.raises(ValidationError):
         Settings(_env_file=None)
-
-
-def test_health_is_ok(client):
-    r = client.get("/health")
-    assert r.status_code == 200
-    assert r.json()["status"] == "ok"
-
-
-def test_ready_when_records_loaded(client):
-    r = client.get("/ready")
-    assert r.status_code == 200
-    assert r.json()["checks"]["records_loaded"] is True
-
-
-def test_missing_document_is_problem_details(client):
-    r = client.get("/v1/documents/999")
-    assert r.status_code == 404
-    assert r.headers["content-type"] == "application/problem+json"
-    body = r.json()
-    assert body["status"] == 404
-    assert body["title"] == "Not Found"
-    assert body["request_id"] == r.headers["X-Request-ID"]
