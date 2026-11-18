@@ -10,8 +10,8 @@ from djangodesk.api.errors import register_error_handlers
 from djangodesk.api.middleware import RequestContextMiddleware
 from djangodesk.api.routes import documents, health
 from djangodesk.config import Settings, get_settings
+from djangodesk.db.session import make_engine, make_sessionmaker
 from djangodesk.logging_setup import setup_logging
-from djangodesk.store import RecordStore
 
 logger = logging.getLogger(__name__)
 
@@ -22,11 +22,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         setup_logging(settings.log_level)
-        store = RecordStore(settings.data_file)
-        store.load()
-        app.state.store = store
+
+        engine = make_engine(settings)
+        app.state.engine = engine
+        app.state.session_factory = make_sessionmaker(engine)
+
         logger.info("app started", extra={"fields": {"env": settings.app_env}})
         yield
+
+        await engine.dispose()
         logger.info("app stopping")
 
     app = FastAPI(title=settings.app_name, lifespan=lifespan)
@@ -34,4 +38,5 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     register_error_handlers(app)
     app.include_router(health.router)
     app.include_router(documents.router)
+
     return app
