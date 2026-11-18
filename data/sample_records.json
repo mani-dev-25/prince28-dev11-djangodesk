@@ -1,0 +1,42 @@
+[
+  {
+    "id": "001",
+    "page": "ref/models/querysets",
+    "topic": "select_related follows foreign keys with a JOIN",
+    "django_version": "5.2",
+    "api_name": "QuerySet.select_related",
+    "orm_method": "select_related"
+  },
+  {
+    "id": "002",
+    "page": "ref/models/querysets",
+    "topic": "prefetch_related loads related objects in a separate query",
+    "django_version": "5.2",
+    "api_name": "QuerySet.prefetch_related",
+    "orm_method": "prefetch_related"
+  },
+  {
+    "id": "003",
+    "page": "ref/models/querysets",
+    "topic": "only loads just the listed fields",
+    "django_version": "5.2",
+    "api_name": "QuerySet.only",
+    "orm_method": "only"
+  },
+  {
+    "id": "004",
+    "page": "ref/models/expressions",
+    "topic": "F expressions update a field using its database value",
+    "django_version": "5.2",
+    "api_name": "F",
+    "orm_method": "update"
+  },
+  {
+    "id": "005",
+    "page": "ref/csrf",
+    "topic": "CSRF protection middleware",
+    "django_version": "5.2",
+    "api_name": "CsrfViewMiddleware",
+    "orm_method": null
+  }
+]
