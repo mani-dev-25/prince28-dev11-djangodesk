@@ -1,0 +1,7 @@
+[33m07512f8[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeat/day-01-foundation[m[33m, [m[1;31morigin/feat/day-01-foundation[m[33m)[m Add : ruff,pre-commit and secret scanning
+[33m3bb426b[m created: .gitignore .env .env.example
+[33m42c3a0e[m problem statement properly updated on README.md
+[33mc35aae8[m docs: add project card,10 questions and requirements
+[33m5f06400[m dependency and dev packages installed
+[33m79b5ffd[m description changed
+[33m98b8f78[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m)[m uv installed
