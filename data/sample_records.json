@@ -44,5 +44,125 @@
     "api_name": "CsrfViewMiddleware",
     "orm_method": null,
     "source_url": "https://docs.djangoproject.com/en/5.2/ref/csrf/"
+  },
+  {
+    "id": "006",
+    "page": "ref/models/querysets",
+    "topic": "filter returns objects matching the given conditions",
+    "django_version": "5.2",
+    "api_name": "QuerySet.filter",
+    "orm_method": "filter"
+  },
+  {
+    "id": "007",
+    "page": "ref/models/querysets",
+    "topic": "exclude returns objects that do not match the given conditions",
+    "django_version": "5.2",
+    "api_name": "QuerySet.exclude",
+    "orm_method": "exclude"
+  },
+  {
+    "id": "008",
+    "page": "ref/models/querysets",
+    "topic": "get retrieves a single object matching the given conditions",
+    "django_version": "5.2",
+    "api_name": "QuerySet.get",
+    "orm_method": "get"
+  },
+  {
+    "id": "009",
+    "page": "ref/models/querysets",
+    "topic": "order_by sorts query results using specified fields",
+    "django_version": "5.2",
+    "api_name": "QuerySet.order_by",
+    "orm_method": "order_by"
+  },
+  {
+    "id": "010",
+    "page": "ref/models/querysets",
+    "topic": "values returns dictionaries containing selected fields",
+    "django_version": "5.2",
+    "api_name": "QuerySet.values",
+    "orm_method": "values"
+  },
+  {
+    "id": "011",
+    "page": "ref/models/querysets",
+    "topic": "values_list returns tuples containing selected field values",
+    "django_version": "5.2",
+    "api_name": "QuerySet.values_list",
+    "orm_method": "values_list"
+  },
+  {
+    "id": "012",
+    "page": "ref/models/querysets",
+    "topic": "annotate adds calculated values to each object in a queryset",
+    "django_version": "5.2",
+    "api_name": "QuerySet.annotate",
+    "orm_method": "annotate"
+  },
+  {
+    "id": "013",
+    "page": "ref/models/querysets",
+    "topic": "aggregate calculates summary values across a queryset",
+    "django_version": "5.2",
+    "api_name": "QuerySet.aggregate",
+    "orm_method": "aggregate"
+  },
+  {
+    "id": "014",
+    "page": "ref/models/querysets",
+    "topic": "distinct removes duplicate results from a queryset",
+    "django_version": "5.2",
+    "api_name": "QuerySet.distinct",
+    "orm_method": "distinct"
+  },
+  {
+    "id": "015",
+    "page": "ref/models/querysets",
+    "topic": "exists checks whether a queryset contains any results",
+    "django_version": "5.2",
+    "api_name": "QuerySet.exists",
+    "orm_method": "exists"
+  },
+  {
+    "id": "016",
+    "page": "ref/models/querysets",
+    "topic": "count returns the number of objects in a queryset",
+    "django_version": "5.2",
+    "api_name": "QuerySet.count",
+    "orm_method": "count"
+  },
+  {
+    "id": "017",
+    "page": "ref/models/querysets",
+    "topic": "bulk_create inserts multiple model objects efficiently",
+    "django_version": "5.2",
+    "api_name": "QuerySet.bulk_create",
+    "orm_method": "bulk_create"
+  },
+  {
+    "id": "018",
+    "page": "ref/models/querysets",
+    "topic": "bulk_update updates multiple model objects efficiently",
+    "django_version": "5.2",
+    "api_name": "QuerySet.bulk_update",
+    "orm_method": "bulk_update"
+  },
+  {
+    "id": "019",
+    "page": "topics/db/transactions",
+    "topic": "transaction.atomic provides a block of code executed as a single database transaction",
+    "django_version": "5.2",
+    "api_name": "transaction.atomic",
+    "orm_method": "atomic"
+  },
+  {
+    "id": "020",
+    "page": "ref/models/querysets",
+    "topic": "select_for_update locks selected rows until the transaction ends",
+    "django_version": "5.2",
+    "api_name": "QuerySet.select_for_update",
+    "orm_method": "select_for_update"
   }
 ]
