@@ -2,34 +2,64 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 
-from djangodesk.api.deps import StoreDep
+from djangodesk.api.deps import RepoDep
+from djangodesk.db.repository import FILTER_KEY
 
 router = APIRouter(prefix="/v1/documents", tags=["documents"])
 
 
 @router.get("")
-def list_documents(
-    store: StoreDep,
+async def list_documents(
+    request: Request,
+    repo: RepoDep,
     q: Annotated[str | None, Query(description="Search text")] = None,
     limit: Annotated[int, Query(ge=1, le=100)] = 20,
     offset: Annotated[int, Query(ge=0)] = 0,
 ) -> dict:
-    """List records, optionally filtered by text, one page at a time."""
-    records = store.search(q) if q else store.records
+    """List documents with text search and metadata filters."""
+
+    reserved = {"q", "limit", "offset"}
+    filters: dict[str, str] = {}
+
+    for key, value in request.query_params.multi_items():
+        if key in reserved:
+            continue
+
+        if not FILTER_KEY.fullmatch(key):
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid filter key: '{key}'",
+            )
+
+        filters[key] = value
+
+    total, items = await repo.list(
+        q=q,
+        filters=filters,
+        limit=limit,
+        offset=offset,
+    )
+
     return {
-        "total": len(records),
+        "total": total,
         "limit": limit,
         "offset": offset,
-        "items": records[offset : offset + limit],
+        "filters": filters,
+        "items": items,
     }
 
 
 @router.get("/{record_id}")
-def get_document(record_id: str, store: StoreDep) -> dict:
-    """Return one record or a 404."""
-    record = store.get(record_id)
-    if record is None:
-        raise HTTPException(status_code=404, detail=f"No document with id '{record_id}'.")
-    return record
+async def get_document(record_id: str, repo: RepoDep) -> dict:
+    """Return one document or a 404."""
+    document = await repo.get(record_id)
+
+    if document is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No document with id '{record_id}'.",
+        )
+
+    return document

@@ -1,9 +1,11 @@
 """Liveness (/health) and readiness (/ready)."""
 
-from fastapi import APIRouter
+from typing import Annotated
+
+from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
-from djangodesk.api.deps import StoreDep
+from djangodesk.api.deps import check_db
 
 router = APIRouter(tags=["health"])
 
@@ -15,8 +17,12 @@ def health() -> dict:
 
 
 @router.get("/ready")
-def ready(store: StoreDep) -> JSONResponse:
-    """Ready check: are the records loaded?"""
-    ok = store.loaded
-    body = {"status": "ready" if ok else "not ready", "checks": {"records_loaded": ok}}
-    return JSONResponse(body, status_code=200 if ok else 503)
+async def ready(
+    database_ok: Annotated[bool, Depends(check_db)],
+) -> JSONResponse:
+    """Ready check: verifies the database connection."""
+    body = {
+        "status": "ready" if database_ok else "not ready",
+        "checks": {"database": database_ok},
+    }
+    return JSONResponse(body, status_code=200 if database_ok else 503)
