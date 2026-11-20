@@ -26,6 +26,9 @@ dev = [
     "pre-commit>=4.7.0",
     "pytest>=9.2.0",
     "ruff>=0.17.5",
+    "pytest-asyncio>=1.3.0",
+    "pytest-cov>=7.0.0",
+    "poethepoet>=0.40.0",
 ]
 
 [tool.ruff]
@@ -35,7 +38,18 @@ target-version = "py312"
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM"]
 
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 filterwarnings = ["ignore:Using `httpx` with `starlette.testclient`"]
+
+[tool.coverage.run]
+source = ["djangodesk"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 70
