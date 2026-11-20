@@ -17,6 +17,9 @@ RUN uv sync --frozen
 
 FROM python:3.12-slim AS runtime
 
+ARG GIT_SHA=dev
+ENV GIT_SHA=${GIT_SHA}
+
 WORKDIR /app
 
 RUN groupadd --system app && useradd --system --gid app app && id app
@@ -30,4 +33,4 @@ USER app
 
 EXPOSE 8000
 
-CMD ["uvicorn", "djangodesk.api:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "djangodesk.api.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000"]
