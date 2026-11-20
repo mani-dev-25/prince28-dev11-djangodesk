@@ -53,3 +53,12 @@ branch = true
 [tool.coverage.report]
 show_missing = true
 fail_under = 70
+
+[tool.poe.tasks]
+dev = "uvicorn djangodesk.api.main:create_app --factory --reload"
+lint = "ruff check src tests"
+test = "pytest"
+cov = "pytest --cov=djangodesk --cov-report=term-missing"
+migrate = "alembic upgrade head"
+seed = "python scripts/load_db.py"
+test-integration = "pytest tests/integration -v"
