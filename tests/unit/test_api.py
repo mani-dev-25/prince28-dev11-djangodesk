@@ -106,9 +106,19 @@ def test_request_id_is_echoed(client):
 
 def test_health_is_ok(client):
     response = client.get("/health")
+    body = response.json()
 
     assert response.status_code == 200
-    assert response.json()["status"] == "ok"
+    assert body["status"] == "ok"
+    assert body["app"] == "djangodesk"
+    assert body["env"] in {"local", "ci", "production"}
+
+
+def test_health_includes_version(client):
+    response = client.get("/health")
+
+    assert response.status_code == 200
+    assert response.json()["version"] == "dev"
 
 
 def test_app_refuses_to_start_without_app_env(monkeypatch):

@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     data_file: Path = Path("data/sample_records.json")
 
     database_url: str
+    git_sha: str = "dev"
 
     @field_validator("database_url")
     @classmethod
