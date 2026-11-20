@@ -19,7 +19,7 @@ FROM python:3.12-slim AS runtime
 
 WORKDIR /app
 
-RUN groupadd --system app && useradd --system --gid app app
+RUN groupadd --system app && useradd --system --gid app app && id app
 
 COPY --from=builder --chown=app:app /app /app
 
