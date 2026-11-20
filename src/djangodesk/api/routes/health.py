@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
 from djangodesk.api.deps import check_db
+from djangodesk.config import get_settings
 
 router = APIRouter(tags=["health"])
 
@@ -13,7 +14,13 @@ router = APIRouter(tags=["health"])
 @router.get("/health")
 def health() -> dict:
     """Alive check: touches nothing else."""
-    return {"status": "ok"}
+    settings = get_settings()
+    return {
+        "status": "ok",
+        "app": settings.app_name,
+        "env": settings.app_env,
+        "version": settings.git_sha,
+    }
 
 
 @router.get("/ready")
