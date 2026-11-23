@@ -2,7 +2,31 @@
 
 **An AI-powered Django ORM performance and security assistant that answers developer questions using official Django documentation, with a goal of demonstrating executable ORM examples, generated SQL, and query performance.**
 
-> **Project Status:** Day 4 completed — backend infrastructure, database integration, Docker, testing, and quality gates are implemented. RAG pipeline development begins in Day 5.
+> **Project Status:** Day 5 completed — backend infrastructure, database integration, Docker, testing, quality gates, CI/CD, and deployment are implemented. RAG pipeline development is the next phase.
+
+---
+
+## Live Deployment
+
+- **Live API:** YOUR_RENDER_URL
+- **Health Check:** YOUR_RENDER_URL/health
+- **Swagger UI:** YOUR_RENDER_URL/docs
+- **Database:** Neon PostgreSQL
+
+### CI/CD Status
+
+![CI](https://github.com/mani-dev-25/prince28-dev11-djangodesk/actions/workflows/ci.yml/badge.svg)
+![CD](https://github.com/mani-dev-25/prince28-dev11-djangodesk/actions/workflows/cd.yml/badge.svg)
+
+DjangoDesk uses GitHub Actions for automated continuous integration and deployment.
+
+- Automated linting using Ruff
+- Unit and integration testing
+- Docker image build
+- Automated database migrations using Alembic
+- Deployment to Render
+- Post-deployment health check
+- PostgreSQL database hosted on Neon
 
 ---
 
@@ -13,6 +37,8 @@ DjangoDesk is an AI assistant designed to help Django developers understand ORM 
 It focuses on practical, reliable answers based on official Django documentation, with an emphasis on examples that developers can understand, run, and verify.
 
 The long-term goal is to go beyond explanations by executing ORM examples against a sample database and showing the SQL generated, query counts, and performance improvements.
+
+---
 
 ## The Problem
 
@@ -38,6 +64,8 @@ Finding the right optimization can be difficult because Django documentation is 
 
 DjangoDesk aims to simplify this by providing focused explanations, optimized ORM examples, documentation references, and eventually executable demonstrations.
 
+---
+
 ## Goals
 
 - Answer Django ORM questions using official documentation.
@@ -49,6 +77,8 @@ DjangoDesk aims to simplify this by providing focused explanations, optimized OR
 - Generate practical code examples.
 - Eventually execute ORM examples and display generated SQL.
 - Demonstrate query-count and performance improvements.
+
+---
 
 ## Planned Signature Feature
 
@@ -97,22 +127,25 @@ The goal is to demonstrate the optimization with actual SQL and query counts rat
 
 ## Tech Stack
 
-| Technology     | Purpose                                   |
-| -------------- | ----------------------------------------- |
-| Python 3.12    | Primary programming language              |
-| FastAPI        | API framework                             |
-| PostgreSQL 17  | Database                                  |
-| pgvector       | Vector database capabilities              |
-| SQLAlchemy     | Database ORM and interaction              |
-| Alembic        | Database migrations                       |
-| Redis 7        | Caching and supporting infrastructure     |
-| uv             | Python package and environment management |
-| Docker         | Containerization                          |
-| Docker Compose | Multi-service orchestration               |
-| pytest         | Testing                                   |
-| pytest-cov     | Test coverage                             |
-| Ruff           | Linting and code quality                  |
-| pre-commit     | Automated code quality checks             |
+| Technology | Purpose |
+|---|---|
+| Python 3.12 | Primary programming language |
+| FastAPI | API framework |
+| PostgreSQL 17 | Primary database |
+| pgvector | Vector database capabilities |
+| SQLAlchemy | Database ORM and interaction |
+| Alembic | Database migrations |
+| Redis 7 | Caching and supporting infrastructure |
+| uv | Python package and environment management |
+| Docker | Containerization |
+| Docker Compose | Multi-service orchestration |
+| pytest | Testing |
+| pytest-cov | Test coverage |
+| Ruff | Linting and code quality |
+| pre-commit | Automated code quality checks |
+| GitHub Actions | CI/CD automation |
+| Render | Application deployment |
+| Neon | Hosted PostgreSQL database |
 
 ---
 
@@ -127,6 +160,21 @@ flowchart TD
     B --> D[Redis]
     E[Migration Service] --> C
     F[Data Loader] --> C
+```
+
+### Deployment Architecture
+
+```mermaid
+flowchart TD
+    A[Developer Push] --> B[GitHub Repository]
+    B --> C[GitHub Actions CI]
+    C --> D[Lint + Tests + Docker Build]
+    D --> E[CD Workflow]
+    E --> F[Alembic Migrations]
+    F --> G[Render Deployment]
+    G --> H[Health Check]
+    H --> I[Live FastAPI Application]
+    I --> J[Neon PostgreSQL]
 ```
 
 ### Planned RAG Architecture
@@ -170,13 +218,19 @@ DjangoDesk/
 │
 ├── docs/
 │
+├── .github/
+│   └── workflows/
+│       ├── ci.yml
+│       └── cd.yml
+│
 ├── Dockerfile
 ├── docker-compose.yml
 ├── pyproject.toml
 ├── uv.lock
 ├── .env.example
 ├── .dockerignore
-└── README.md
+├── README.md
+└── NOTES.md
 ```
 
 > The project structure may evolve as the RAG pipeline and additional features are implemented.
@@ -201,8 +255,8 @@ Make sure you have the following installed:
 ### 1. Clone the repository
 
 ```bash
-git clone <YOUR_REPOSITORY_URL>
-cd <YOUR_REPOSITORY_NAME>
+git clone https://github.com/mani-dev-25/prince28-dev11-djangodesk.git
+cd prince28-dev11-djangodesk
 ```
 
 ### 2. Install dependencies
@@ -233,11 +287,11 @@ uv run poe dev
 
 ### 5. Access the API
 
-| Resource     | URL                                                          |
-| ------------ | ------------------------------------------------------------ |
-| API          | [http://localhost:8000](http://localhost:8000)               |
-| Swagger UI   | [http://localhost:8000/docs](http://localhost:8000/docs)     |
-| Health Check | [http://localhost:8000/health](http://localhost:8000/health) |
+| Resource | URL |
+|---|---|
+| API | http://localhost:8000 |
+| Swagger UI | http://localhost:8000/docs |
+| Health Check | http://localhost:8000/health |
 
 ---
 
@@ -247,11 +301,11 @@ DjangoDesk uses Docker Compose to run the backend infrastructure and application
 
 ### Services
 
-| Service   | Description                                      |
-| --------- | ------------------------------------------------ |
-| `api`     | FastAPI application                              |
-| `db`      | PostgreSQL 17 with pgvector                      |
-| `redis`   | Redis 7                                          |
+| Service | Description |
+|---|---|
+| `api` | FastAPI application |
+| `db` | PostgreSQL 17 with pgvector |
+| `redis` | Redis 7 |
 | `migrate` | Runs database migrations and sample data loading |
 
 ### 1. Build the images
@@ -328,6 +382,7 @@ DjangoDesk currently uses PostgreSQL as its primary database.
 - Alembic migrations
 - GIN index on metadata
 - Dedicated test database configuration
+- Neon-hosted PostgreSQL for deployment
 
 ### Migrations
 
@@ -338,6 +393,8 @@ uv run poe migrate
 ```
 
 Docker Compose also runs migrations through the migration service during startup.
+
+In the deployed environment, database migrations are handled through the CI/CD workflow.
 
 ### Sample Data
 
@@ -381,13 +438,13 @@ The project enforces a minimum test coverage threshold of **70%**.
 
 ### Current Test Results
 
-| Metric                                    | Result |
-| ----------------------------------------- | -----: |
-| Unit tests passed                         |     16 |
-| Integration tests implemented             |      6 |
-| Integration tests skipped without test DB |      6 |
-| Test coverage                             | 81.94% |
-| Minimum coverage requirement              |    70% |
+| Metric | Result |
+|---|---:|
+| Unit tests passed | 16 |
+| Integration tests implemented | 6 |
+| Integration tests skipped without test DB | 6 |
+| Test coverage | 81.94% |
+| Minimum coverage requirement | 70% |
 
 ---
 
@@ -413,23 +470,61 @@ Quality checks are intended to keep the codebase consistent, maintainable, and r
 
 ---
 
+## CI/CD Pipeline
+
+DjangoDesk uses GitHub Actions to automate quality checks and deployment.
+
+### Continuous Integration
+
+The CI workflow performs:
+
+- Repository checkout
+- Python environment setup
+- Dependency installation using uv
+- Ruff linting
+- Unit tests
+- Integration tests
+- Docker image build
+- Docker image publishing to GitHub Container Registry on main
+
+### Continuous Deployment
+
+The CD workflow performs:
+
+- Database migrations using Alembic
+- Deployment trigger for the Render web service
+- Post-deployment health check
+- Verification that the `/health` endpoint returns a successful response
+
+### Deployment
+
+The backend is deployed on Render and uses Neon PostgreSQL for the hosted database.
+
+| Resource | Link |
+|---|---|
+| Live API | YOUR_RENDER_URL |
+| Health Check | YOUR_RENDER_URL/health |
+| Swagger UI | YOUR_RENDER_URL/docs |
+
+---
+
 ## Available Commands
 
-| Command                       | Description                  |
-| ----------------------------- | ---------------------------- |
-| `uv sync`                     | Install project dependencies |
-| `uv run poe dev`              | Start development server     |
-| `uv run poe lint`             | Run Ruff lint checks         |
-| `uv run poe test`             | Run unit tests               |
-| `uv run poe test-integration` | Run integration tests        |
-| `uv run poe cov`              | Run tests with coverage      |
-| `uv run poe migrate`          | Apply database migrations    |
-| `uv run poe seed`             | Load sample records          |
-| `docker compose build`        | Build Docker images          |
-| `docker compose up`           | Build/start services         |
-| `docker compose up -d`        | Start services in background |
-| `docker compose down`         | Stop services                |
-| `docker compose logs -f`      | Follow service logs          |
+| Command | Description |
+|---|---|
+| `uv sync` | Install project dependencies |
+| `uv run poe dev` | Start development server |
+| `uv run poe lint` | Run Ruff lint checks |
+| `uv run poe test` | Run unit tests |
+| `uv run poe test-integration` | Run integration tests |
+| `uv run poe cov` | Run tests with coverage |
+| `uv run poe migrate` | Apply database migrations |
+| `uv run poe seed` | Load sample records |
+| `docker compose build` | Build Docker images |
+| `docker compose up` | Build/start services |
+| `docker compose up -d` | Start services in background |
+| `docker compose down` | Stop services |
+| `docker compose logs -f` | Follow service logs |
 
 ---
 
@@ -491,15 +586,24 @@ Django documentation is available under its respective licensing terms. Refer to
 - Ruff and pre-commit
 - Docker verification
 
-### Day 5 — RAG Foundations
+### Day 5 — CI/CD and Deployment
 
-- Document ingestion
-- Text extraction
-- Document processing
-- Chunking strategy
+- GitHub Actions CI pipeline
+- Automated linting and testing
+- Docker image build pipeline
+- Continuous deployment workflow
+- Automated Alembic migrations
+- Render deployment
+- Neon PostgreSQL integration
+- Post-deployment health check
+- Deployment rollback procedure documentation
+- Week 1 milestone
 
 ### Upcoming
 
+- Document ingestion pipeline
+- Text extraction
+- Chunking
 - Embedding generation
 - Vector storage using pgvector
 - Semantic search
@@ -511,7 +615,6 @@ Django documentation is available under its respective licensing terms. Refer to
 - Generated SQL viewer
 - Query-count comparison
 - Django security assistant
-- Deployment
 
 ---
 
@@ -519,13 +622,13 @@ Django documentation is available under its respective licensing terms. Refer to
 
 The project's primary target is to validate the quality and usefulness of its ORM optimization answers.
 
-| Metric                                     | Target                        |
-| ------------------------------------------ | ----------------------------- |
-| ORM code answers that execute successfully | 90%+                          |
-| Evaluation tasks                           | 30 ORM optimization tasks     |
-| Query optimization claims                  | Verified using query counts   |
-| Documentation grounding                    | Official Django documentation |
-| Minimum automated test coverage            | 70%                           |
+| Metric | Target |
+|---|---|
+| ORM code answers that execute successfully | 90%+ |
+| Evaluation tasks | 30 ORM optimization tasks |
+| Query optimization claims | Verified using query counts |
+| Documentation grounding | Official Django documentation |
+| Minimum automated test coverage | 70% |
 
 These are project goals, not current measured production results.
 
@@ -553,6 +656,14 @@ These are project goals, not current measured production results.
 - [x] Database migrations verified inside Docker
 - [x] 20 sample records loaded successfully
 - [x] API health check verified
+- [x] GitHub Actions CI
+- [x] Automated lint and test pipeline
+- [x] Docker image build pipeline
+- [x] CD workflow
+- [x] Web service deployed on Render
+- [x] PostgreSQL hosted on Neon
+- [x] Automated deployment migrations
+- [x] Post-deployment health check
 - [ ] Document ingestion pipeline
 - [ ] Text extraction
 - [ ] Chunking
@@ -562,7 +673,6 @@ These are project goals, not current measured production results.
 - [ ] LLM integration
 - [ ] ORM-to-SQL execution engine
 - [ ] SQL and query-count viewer
-- [ ] Deployment
 
 ---
 
