@@ -8,3 +8,5 @@ __pycache__/
 # Test coverage reports
 .coverage
 htmlcov/
+
+*.py[cod]
