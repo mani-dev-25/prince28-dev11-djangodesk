@@ -90,3 +90,33 @@ The table contains only 5 documents. Scanning a small table is cheaper than acce
 ### 5. When would PostgreSQL use the GIN index?
 
 When the table becomes larger and the query planner estimates that using the GIN index is cheaper than scanning the entire table.
+
+
+## D05 — CI/CD, deployment and rollback
+
+### Deployment
+- Application deployed to Render: https://djangodesk-iagt.onrender.com
+- Health endpoint: `/health`
+- Health check returned HTTP 200.
+- GitHub Actions CI/CD workflows configured.
+
+### Rollback procedure
+If a deployment fails:
+1. Identify the last working deployment on Render.
+2. Open Render Dashboard → Service → Deploys.
+3. Select the previous successful deployment.
+4. Roll back to that deployment.
+5. Verify `/health` returns HTTP 200.
+
+### Rollback drill
+A manual rollback procedure is documented. A full rollback drill was not performed yet.
+
+### Lead time
+Lead time was not formally measured during Week 1.
+
+### Smoke test
+The deployed application was tested successfully:
+- Endpoint: `/health`
+- HTTP status: 200
+- Application: djangodesk
+- Version: dev
