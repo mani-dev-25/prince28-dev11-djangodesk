@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - feat/day-05-ci
+      - feat/day-05-cd
   pull_request:
     branches:
       - main
