@@ -1,261 +1,212 @@
 # DjangoDesk
 
-**An AI-powered Django ORM performance and security assistant that answers developer questions using official Django documentation, with a goal of demonstrating executable ORM examples, generated SQL, and query performance.**
+<p align="center">
+  <strong>An AI-assisted Django ORM performance and security learning assistant</strong>
+</p>
 
-> **Project Status:** Day 5 completed — backend infrastructure, database integration, Docker, testing, quality gates, CI/CD, and deployment are implemented. RAG pipeline development is the next phase.
+<p align="center">
+  Built with FastAPI, PostgreSQL, pgvector, Docker, and GitHub Actions.
+</p>
+
+<p align="center">
+  <a href="https://github.com/mani-dev-25/prince28-dev11-djangodesk/actions/workflows/ci.yml">
+    <img src="https://github.com/mani-dev-25/prince28-dev11-djangodesk/actions/workflows/ci.yml/badge.svg" alt="CI">
+  </a>
+  <a href="https://github.com/mani-dev-25/prince28-dev11-djangodesk/actions/workflows/cd.yml">
+    <img src="https://github.com/mani-dev-25/prince28-dev11-djangodesk/actions/workflows/cd.yml/badge.svg" alt="CD">
+  </a>
+</p>
 
 ---
 
-## Live Deployment
+## Live Application
 
-- **Live API:** YOUR_RENDER_URL
-- **Health Check:** YOUR_RENDER_URL/health
-- **Swagger UI:** YOUR_RENDER_URL/docs
-- **Database:** Neon PostgreSQL
+**Live:** https://djangodesk-iagt.onrender.com
 
-### CI/CD Status
-
-![CI](https://github.com/mani-dev-25/prince28-dev11-djangodesk/actions/workflows/ci.yml/badge.svg)
-![CD](https://github.com/mani-dev-25/prince28-dev11-djangodesk/actions/workflows/cd.yml/badge.svg)
-
-DjangoDesk uses GitHub Actions for automated continuous integration and deployment.
-
-- Automated linting using Ruff
-- Unit and integration testing
-- Docker image build
-- Automated database migrations using Alembic
-- Deployment to Render
-- Post-deployment health check
-- PostgreSQL database hosted on Neon
+**Health Check:** https://djangodesk-iagt.onrender.com/health
 
 ---
 
 ## Overview
 
-DjangoDesk is an AI assistant designed to help Django developers understand ORM performance issues, database optimization, and security practices without having to search through large amounts of documentation manually.
+DjangoDesk is an AI-assisted learning and development project focused on understanding Django ORM performance, query optimization, and security-related concepts.
 
-It focuses on practical, reliable answers based on official Django documentation, with an emphasis on examples that developers can understand, run, and verify.
+The project provides a backend foundation for exploring ORM-related problems, understanding database behavior, and developing an AI-assisted tool that helps developers learn better Django ORM practices.
 
-The long-term goal is to go beyond explanations by executing ORM examples against a sample database and showing the SQL generated, query counts, and performance improvements.
-
----
-
-## The Problem
-
-Django's ORM allows developers to interact with databases using Python instead of writing SQL directly. However, ORM queries can sometimes create hidden performance problems.
-
-For example, accessing related objects inside a loop can cause the **N+1 query problem**.
-
-```python
-orders = Order.objects.all()
-
-for order in orders:
-    print(order.customer.name)
-```
-
-If there are 100 orders, Django may execute:
-
-- 1 query to fetch orders
-- 100 additional queries to fetch customers
-
-This results in 101 database queries instead of potentially just 1 or 2.
-
-Finding the right optimization can be difficult because Django documentation is extensive, version-dependent, and covers many different topics.
-
-DjangoDesk aims to simplify this by providing focused explanations, optimized ORM examples, documentation references, and eventually executable demonstrations.
+The project is built using modern Python backend technologies, PostgreSQL, Docker, automated testing, and CI/CD workflows.
 
 ---
 
-## Goals
+## Problem Statement
 
-- Answer Django ORM questions using official documentation.
-- Explain database performance problems in beginner-friendly language.
-- Identify inefficient ORM patterns such as N+1 queries.
-- Recommend suitable ORM optimization techniques.
-- Explain Django security practices.
-- Support multiple Django LTS versions.
-- Generate practical code examples.
-- Eventually execute ORM examples and display generated SQL.
-- Demonstrate query-count and performance improvements.
+Developers using Django ORM may face problems such as:
+
+- N+1 query problems
+- Unnecessary database queries
+- Improper ORM usage
+- Inefficient relationships and query patterns
+- Performance bottlenecks
+- Potential security mistakes
+
+Understanding these problems can be difficult for beginners because ORM code often hides the SQL queries generated behind it.
+
+DjangoDesk aims to make ORM learning and analysis easier through an AI-assisted development approach.
 
 ---
 
-## Planned Signature Feature
+## Objectives
 
-### ORM-to-SQL Explorer
-
-DjangoDesk aims to transform ORM optimization answers into verifiable demonstrations.
-
-For a query such as:
-
-> How can I fix the N+1 query problem when accessing customer details from orders?
-
-The planned system will:
-
-1. Explain the N+1 query problem.
-2. Show the inefficient ORM implementation.
-3. Execute the example against a sample database.
-4. Display the generated SQL.
-5. Show the original query count.
-6. Apply an optimization using `select_related()`.
-7. Execute the optimized version.
-8. Compare the query count before and after.
-
-### Example
-
-**Before optimization**
-
-```python
-orders = Order.objects.all()
-
-for order in orders:
-    print(order.customer.name)
-```
-
-**After optimization**
-
-```python
-orders = Order.objects.select_related("customer")
-
-for order in orders:
-    print(order.customer.name)
-```
-
-The goal is to demonstrate the optimization with actual SQL and query counts rather than simply claiming that the code is faster.
+- Build a Python backend application using FastAPI.
+- Work with PostgreSQL as the primary database.
+- Explore database performance and query optimization.
+- Use SQLAlchemy and Alembic for database operations and migrations.
+- Build a structured foundation for AI-assisted ORM analysis.
+- Implement automated testing and code-quality checks.
+- Containerize the application using Docker.
+- Implement CI/CD using GitHub Actions.
+- Deploy the application to Render.
 
 ---
 
 ## Tech Stack
 
-| Technology | Purpose |
-|---|---|
-| Python 3.12 | Primary programming language |
-| FastAPI | API framework |
-| PostgreSQL 17 | Primary database |
-| pgvector | Vector database capabilities |
-| SQLAlchemy | Database ORM and interaction |
-| Alembic | Database migrations |
-| Redis 7 | Caching and supporting infrastructure |
-| uv | Python package and environment management |
-| Docker | Containerization |
-| Docker Compose | Multi-service orchestration |
-| pytest | Testing |
-| pytest-cov | Test coverage |
-| Ruff | Linting and code quality |
-| pre-commit | Automated code quality checks |
-| GitHub Actions | CI/CD automation |
-| Render | Application deployment |
-| Neon | Hosted PostgreSQL database |
+### Backend
+
+- Python 3.12
+- FastAPI
+- Pydantic
+- SQLAlchemy
+- Alembic
+- Async programming
+
+### Database
+
+- PostgreSQL
+- Neon PostgreSQL
+- pgvector
+- JSONB
+- GIN Indexing
+
+### Development Tools
+
+- UV
+- Ruff
+- pytest
+- pytest-cov
+- pre-commit
+- Git
+
+### DevOps
+
+- Docker
+- Docker Compose
+- GitHub Actions
+- Render
 
 ---
 
 ## Architecture
 
-### Current Infrastructure
-
-```mermaid
-flowchart TD
-    A[Client] --> B[FastAPI]
-    B --> C[PostgreSQL + pgvector]
-    B --> D[Redis]
-    E[Migration Service] --> C
-    F[Data Loader] --> C
+```text
+                 Developer
+                     |
+                     v
+              GitHub Repository
+                     |
+                     v
+             GitHub Actions CI
+          -----------------------
+          |                     |
+       Testing                Linting
+          |                     |
+          -----------+-----------
+                     |
+                     v
+                CD Workflow
+                     |
+             Alembic Migration
+                     |
+                     v
+               Render Deploy
+                     |
+                     v
+             DjangoDesk FastAPI
+                     |
+                     v
+             Neon PostgreSQL
 ```
-
-### Deployment Architecture
-
-```mermaid
-flowchart TD
-    A[Developer Push] --> B[GitHub Repository]
-    B --> C[GitHub Actions CI]
-    C --> D[Lint + Tests + Docker Build]
-    D --> E[CD Workflow]
-    E --> F[Alembic Migrations]
-    F --> G[Render Deployment]
-    G --> H[Health Check]
-    H --> I[Live FastAPI Application]
-    I --> J[Neon PostgreSQL]
-```
-
-### Planned RAG Architecture
-
-```mermaid
-flowchart TD
-    A[User Question] --> B[FastAPI]
-    B --> C[Query Processing]
-    C --> D[Embedding Generation]
-    D --> E[Vector Search - pgvector]
-    E --> F[Relevant Django Documentation]
-    F --> G[LLM Response Generation]
-    G --> H[Answer with Sources]
-```
-
-The RAG architecture is planned for upcoming development. The current project is focused on building and validating the backend foundation first.
 
 ---
 
 ## Project Structure
 
 ```text
-DjangoDesk/
-│
-├── src/
-│   └── djangodesk/
-│       ├── api/
-│       ├── db/
-│       ├── config.py
-│       └── ...
-│
-├── migrations/
-│   └── versions/
-│
-├── scripts/
-│   └── load_db.py
-│
-├── tests/
-│   ├── unit/
-│   └── integration/
-│
-├── docs/
+djangodesk/
 │
 ├── .github/
 │   └── workflows/
 │       ├── ci.yml
 │       └── cd.yml
 │
+├── data/
+│   └── sample_records.json
+│
+├── docs/
+│   ├── QUESTIONS.md
+│   └── REQUIREMENTS.md
+│
+├── migrations/
+│   ├── versions/
+│   └── env.py
+│
+├── scripts/
+│   ├── load_db.py
+│   └── smoke.py
+│
+├── src/
+│   └── djangodesk/
+│       ├── api/
+│       │   └── main.py
+│       ├── db/
+│       │   └── models.py
+│       └── config.py
+│
+├── tests/
+│   ├── unit/
+│   └── integration/
+│
+├── .env.example
+├── .gitignore
+├── .pre-commit-config.yaml
 ├── Dockerfile
 ├── docker-compose.yml
+├── Makefile
 ├── pyproject.toml
 ├── uv.lock
-├── .env.example
-├── .dockerignore
 ├── README.md
 └── NOTES.md
 ```
 
-> The project structure may evolve as the RAG pipeline and additional features are implemented.
-
 ---
 
-## Getting Started
+## Run Locally
 
-### Prerequisites
+### Requirements
 
-Make sure you have the following installed:
+Make sure you have installed:
 
 - Python 3.12
-- [uv](https://docs.astral.sh/uv/)
-- Docker Desktop / Docker Engine
+- UV
 - Git
-
----
-
-## Running Locally
+- Docker Desktop (for Docker-based setup)
 
 ### 1. Clone the repository
 
 ```bash
 git clone https://github.com/mani-dev-25/prince28-dev11-djangodesk.git
+```
+
+```bash
 cd prince28-dev11-djangodesk
 ```
 
@@ -267,144 +218,156 @@ uv sync
 
 ### 3. Configure environment variables
 
-Create your local `.env` file from the example:
+Copy the example environment file:
 
-**Windows PowerShell**
+**Windows PowerShell:**
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-Update the environment variables according to your local database configuration.
-
-> Never commit `.env` files or real credentials to GitHub.
-
-### 4. Start the development server
+**Linux/macOS:**
 
 ```bash
-uv run poe dev
+cp .env.example .env
 ```
 
-### 5. Access the API
+Update the `.env` file with your required configuration.
 
-| Resource | URL |
-|---|---|
-| API | http://localhost:8000 |
-| Swagger UI | http://localhost:8000/docs |
-| Health Check | http://localhost:8000/health |
+Never commit your `.env` file or expose database credentials.
+
+### 4. Run database migrations
+
+```bash
+uv run alembic upgrade head
+```
+
+### 5. Start the application
+
+```bash
+uv run uvicorn djangodesk.api.main:app --reload
+```
+
+The local application should be accessible at:
+
+```text
+http://127.0.0.1:8000
+```
+
+Health endpoint:
+
+```text
+http://127.0.0.1:8000/health
+```
 
 ---
 
-## Running with Docker
+## Run locally in one command
 
-DjangoDesk uses Docker Compose to run the backend infrastructure and application services.
-
-### Services
-
-| Service | Description |
-|---|---|
-| `api` | FastAPI application |
-| `db` | PostgreSQL 17 with pgvector |
-| `redis` | Redis 7 |
-| `migrate` | Runs database migrations and sample data loading |
-
-### 1. Build the images
+Start the application and required services using Docker Compose:
 
 ```bash
-docker compose build
+docker compose up --build
 ```
 
-### 2. Start the services
-
-```bash
-docker compose up
-```
-
-This starts the required infrastructure, waits for healthy dependencies, applies database migrations, loads sample records, and starts the API.
-
-### 3. Run in detached mode
-
-```bash
-docker compose up -d
-```
-
-### 4. View running services
-
-```bash
-docker compose ps
-```
-
-### 5. View logs
-
-```bash
-docker compose logs -f
-```
-
-To view logs for a particular service:
-
-```bash
-docker compose logs -f api
-```
-
-```bash
-docker compose logs -f db
-```
-
-```bash
-docker compose logs -f redis
-```
-
-### 6. Stop services
+To stop the services:
 
 ```bash
 docker compose down
 ```
 
-### 7. Stop services and delete database volumes
+To run unit tests locally:
 
 ```bash
-docker compose down -v
+uv run pytest tests/unit
 ```
 
-> **Warning:** The `-v` option removes Docker volumes, including the PostgreSQL volume containing your local database data. Use it only when you intentionally want to reset the database.
+---
+
+## Docker
+
+Build the Docker image:
+
+```bash
+docker build -t djangodesk .
+```
+
+Run the application container:
+
+```bash
+docker run --env-file .env -p 8000:8000 djangodesk
+```
+
+Alternatively, use Docker Compose:
+
+```bash
+docker compose up --build
+```
+
+Stop Docker Compose:
+
+```bash
+docker compose down
+```
 
 ---
 
 ## Database
 
-DjangoDesk currently uses PostgreSQL as its primary database.
+DjangoDesk uses PostgreSQL for structured data storage.
 
-### Database Features
+### Database Features Used
 
-- PostgreSQL 17
-- pgvector extension support
-- SQLAlchemy database integration
+- PostgreSQL relational database
+- SQLAlchemy ORM
 - Alembic migrations
-- GIN index on metadata
-- Dedicated test database configuration
-- Neon-hosted PostgreSQL for deployment
+- JSONB fields
+- GIN indexes
+- pgvector extension support
 
-### Migrations
+### Database Migrations
 
-Apply database migrations:
-
-```bash
-uv run poe migrate
-```
-
-Docker Compose also runs migrations through the migration service during startup.
-
-In the deployed environment, database migrations are handled through the CI/CD workflow.
-
-### Sample Data
-
-Load sample records:
+Apply migrations:
 
 ```bash
-uv run poe seed
+uv run alembic upgrade head
 ```
 
-The current Docker startup process successfully loaded 20 sample records.
+Check the current migration:
+
+```bash
+uv run alembic current
+```
+
+View migration history:
+
+```bash
+uv run alembic history
+```
+
+Create a new migration:
+
+```bash
+uv run alembic revision --autogenerate -m "describe_change"
+```
+
+---
+
+## Data Loading
+
+Sample data is provided through:
+
+```text
+data/sample_records.json
+```
+
+Load the data into the database:
+
+```bash
+uv run python scripts/load_db.py
+```
+
+The data loader supports idempotent behavior, preventing duplicate records when the same data is loaded multiple times.
 
 ---
 
@@ -415,288 +378,265 @@ DjangoDesk uses pytest for automated testing.
 ### Run unit tests
 
 ```bash
-uv run poe test
+uv run pytest tests/unit
 ```
 
-### Run integration tests
+### Run all tests
 
 ```bash
-uv run poe test-integration
+uv run pytest
 ```
-
-Integration tests require a dedicated PostgreSQL database configured through `TEST_DATABASE_URL`.
-
-> Do not configure the integration test database to use a production database. The integration test setup creates and deletes its own test database.
 
 ### Run tests with coverage
 
 ```bash
-uv run poe cov
+uv run pytest --cov=djangodesk
 ```
-
-The project enforces a minimum test coverage threshold of **70%**.
 
 ### Current Test Results
 
-| Metric | Result |
-|---|---:|
-| Unit tests passed | 16 |
-| Integration tests implemented | 6 |
-| Integration tests skipped without test DB | 6 |
-| Test coverage | 81.94% |
-| Minimum coverage requirement | 70% |
+- Unit tests: 17 passed
+- Unit test suite successfully verified during the Week 1 self-check.
 
 ---
 
 ## Code Quality
 
-DjangoDesk uses Ruff for linting and pre-commit for automated code quality checks.
+Ruff is used for linting.
 
-### Run Ruff
-
-```bash
-uv run poe lint
-```
-
-### Pre-commit
-
-Run the configured checks:
+Run Ruff:
 
 ```bash
-pre-commit run --all-files
+uv run ruff check .
 ```
 
-Quality checks are intended to keep the codebase consistent, maintainable, and reliable as new features are added.
+Run pre-commit checks:
+
+```bash
+uv run pre-commit run --all-files
+```
+
+Install pre-commit hooks:
+
+```bash
+uv run pre-commit install
+```
 
 ---
 
 ## CI/CD Pipeline
 
-DjangoDesk uses GitHub Actions to automate quality checks and deployment.
+DjangoDesk uses GitHub Actions to automate testing and deployment.
 
 ### Continuous Integration
 
-The CI workflow performs:
+The CI workflow is located at:
 
-- Repository checkout
-- Python environment setup
-- Dependency installation using uv
-- Ruff linting
-- Unit tests
-- Integration tests
-- Docker image build
-- Docker image publishing to GitHub Container Registry on main
+```text
+.github/workflows/ci.yml
+```
+
+The CI pipeline performs automated checks, including:
+
+- Dependency installation
+- Code quality checks
+- Automated tests
+- Docker build validation
+
+CI workflow:
+
+https://github.com/mani-dev-25/prince28-dev11-djangodesk/actions/workflows/ci.yml
 
 ### Continuous Deployment
 
-The CD workflow performs:
+The CD workflow is located at:
 
-- Database migrations using Alembic
-- Deployment trigger for the Render web service
-- Post-deployment health check
-- Verification that the `/health` endpoint returns a successful response
+```text
+.github/workflows/cd.yml
+```
 
-### Deployment
+The CD workflow automates:
 
-The backend is deployed on Render and uses Neon PostgreSQL for the hosted database.
+1. Installing Python and UV.
+2. Installing project dependencies.
+3. Running Alembic database migrations.
+4. Triggering Render deployment through a deploy hook.
+5. Waiting for the deployment.
+6. Checking the live health endpoint.
+7. Failing the workflow if the health check does not succeed.
 
-| Resource | Link |
+CD workflow:
+
+https://github.com/mani-dev-25/prince28-dev11-djangodesk/actions/workflows/cd.yml
+
+---
+
+## Deployment
+
+DjangoDesk is deployed using Render.
+
+### Deployment Components
+
+| Component | Platform |
 |---|---|
-| Live API | YOUR_RENDER_URL |
-| Health Check | YOUR_RENDER_URL/health |
-| Swagger UI | YOUR_RENDER_URL/docs |
+| Application hosting | Render |
+| Database | Neon PostgreSQL |
+| CI | GitHub Actions |
+| CD | GitHub Actions |
+| Containerization | Docker |
+
+### Live Deployment
+
+```text
+https://djangodesk-iagt.onrender.com
+```
+
+### Health Check
+
+```text
+https://djangodesk-iagt.onrender.com/health
+```
+
+Expected response:
+
+```json
+{
+  "status": "ok",
+  "app": "djangodesk",
+  "env": "production",
+  "version": "dev"
+}
+```
+
+The exact response values may differ based on the deployed environment and application version.
 
 ---
 
-## Available Commands
+## Smoke Testing
 
-| Command | Description |
-|---|---|
-| `uv sync` | Install project dependencies |
-| `uv run poe dev` | Start development server |
-| `uv run poe lint` | Run Ruff lint checks |
-| `uv run poe test` | Run unit tests |
-| `uv run poe test-integration` | Run integration tests |
-| `uv run poe cov` | Run tests with coverage |
-| `uv run poe migrate` | Apply database migrations |
-| `uv run poe seed` | Load sample records |
-| `docker compose build` | Build Docker images |
-| `docker compose up` | Build/start services |
-| `docker compose up -d` | Start services in background |
-| `docker compose down` | Stop services |
-| `docker compose logs -f` | Follow service logs |
+A smoke-test script is available to verify the live application.
 
----
+```bash
+uv run python scripts/smoke.py https://djangodesk-iagt.onrender.com
+```
 
-## Data Sources
+Successful result:
 
-DjangoDesk is designed to use official Django documentation as its primary knowledge source.
+```text
+Checking: https://djangodesk-iagt.onrender.com/health
+SMOKE TEST PASSED
+HTTP Status: 200
+Application: djangodesk
+Version: dev
+```
 
-Planned sources include:
-
-- Django documentation
-- Django release notes
-- Django LTS documentation
-- Django security release notes
-- ORM documentation
-- QuerySet API reference
-- Database optimization documentation
-
-### Official Resources
-
-- [Django Official Website](https://www.djangoproject.com/)
-- [Django Documentation](https://docs.djangoproject.com/)
-- [Django GitHub Repository](https://github.com/django/django)
-
-Django documentation is available under its respective licensing terms. Refer to the official Django repository and documentation for license details.
+This confirms that the deployed application is responding successfully to health-check requests.
 
 ---
 
-## Development Roadmap
+## Engineering Notes
 
-### Day 1 — Project Foundation
+Engineering observations, migration checks, database experiments, idempotency tests, query plans, deployment notes, and rollback procedures are documented in:
 
-- Project initialization
-- Python environment setup
-- Core configuration
-- Initial backend structure
+```text
+NOTES.md
+```
 
-### Day 2 — Backend Development
+Topics include:
 
-- Core API development
-- Database foundation
-- Configuration and application structure
-
-### Day 3 — PostgreSQL Integration
-
-- PostgreSQL setup
-- SQLAlchemy integration
-- Alembic migrations
-- Database improvements
-
-### Day 4 — Docker and Quality Gates
-
-- Multi-stage Docker build
-- Docker Compose services
-- PostgreSQL and Redis infrastructure
-- Migration service
-- Automated data loading
-- Unit and integration tests
-- Coverage enforcement
-- Ruff and pre-commit
-- Docker verification
-
-### Day 5 — CI/CD and Deployment
-
-- GitHub Actions CI pipeline
-- Automated linting and testing
-- Docker image build pipeline
-- Continuous deployment workflow
-- Automated Alembic migrations
-- Render deployment
-- Neon PostgreSQL integration
-- Post-deployment health check
-- Deployment rollback procedure documentation
-- Week 1 milestone
-
-### Upcoming
-
-- Document ingestion pipeline
-- Text extraction
-- Chunking
-- Embedding generation
-- Vector storage using pgvector
-- Semantic search
-- Retrieval pipeline
-- LLM integration
-- Answer generation with source references
-- Django ORM optimization assistant
-- Executable ORM examples
-- Generated SQL viewer
-- Query-count comparison
-- Django security assistant
+- Database migrations
+- Data-loader idempotency
+- PostgreSQL query plans
+- GIN index behavior
+- CI/CD
+- Deployment verification
+- Rollback procedures
 
 ---
 
-## Target Metrics
+## Week 1 Progress
 
-The project's primary target is to validate the quality and usefulness of its ORM optimization answers.
-
-| Metric | Target |
-|---|---|
-| ORM code answers that execute successfully | 90%+ |
-| Evaluation tasks | 30 ORM optimization tasks |
-| Query optimization claims | Verified using query counts |
-| Documentation grounding | Official Django documentation |
-| Minimum automated test coverage | 70% |
-
-These are project goals, not current measured production results.
+| Day | Focus | Status |
+|---|---|---|
+| Day 1 | Repository setup, requirements, FastAPI foundation | Completed |
+| Day 2 | Sample data and data-loading tasks | Completed |
+| Day 3 | PostgreSQL, migrations, indexing | Completed |
+| Day 4 | Docker, Compose and automated testing | Completed |
+| Day 5 | CI/CD and live deployment | Completed |
 
 ---
 
-## Current Progress
+## Week 1 Self-Check
 
-- [x] Backend foundation
-- [x] FastAPI application
+Run the self-check script:
+
+```bash
+uv run python scripts/check_week1.py
+```
+
+To include the live deployment check:
+
+```bash
+uv run python scripts/check_week1.py https://djangodesk-iagt.onrender.com
+```
+
+The script checks project files, repository configuration, tests, Docker, CI/CD configuration, deployment information, and the live health endpoint.
+
+---
+
+## Roadmap
+
+- [x] Project repository setup
+- [x] FastAPI application foundation
 - [x] PostgreSQL integration
-- [x] SQLAlchemy setup
 - [x] Alembic migrations
-- [x] PostgreSQL GIN index
-- [x] Sample data loading
-- [x] Redis infrastructure
-- [x] Docker multi-stage build
-- [x] Docker Compose setup
-- [x] Non-root Docker user
+- [x] Data loader
+- [x] Docker setup
 - [x] Unit tests
-- [x] Integration tests
-- [x] Coverage enforcement
-- [x] Ruff linting
-- [x] Pre-commit checks
-- [x] Docker startup verified
-- [x] Database migrations verified inside Docker
-- [x] 20 sample records loaded successfully
-- [x] API health check verified
-- [x] GitHub Actions CI
-- [x] Automated lint and test pipeline
-- [x] Docker image build pipeline
-- [x] CD workflow
-- [x] Web service deployed on Render
-- [x] PostgreSQL hosted on Neon
-- [x] Automated deployment migrations
-- [x] Post-deployment health check
-- [ ] Document ingestion pipeline
-- [ ] Text extraction
-- [ ] Chunking
-- [ ] Embeddings
-- [ ] Semantic retrieval
-- [ ] RAG pipeline
-- [ ] LLM integration
-- [ ] ORM-to-SQL execution engine
-- [ ] SQL and query-count viewer
+- [x] CI pipeline
+- [x] CD pipeline
+- [x] Render deployment
+- [x] Health check
+- [x] Smoke test
+- [ ] Complete Week 1 final self-check
+- [ ] Continue AI-assisted ORM analysis development
+- [ ] Build deeper ORM performance analysis features
+- [ ] Improve AI-based explanations and learning workflow
 
 ---
 
-## Why DjangoDesk?
+## Learning Outcomes
 
-DjangoDesk is being built to solve a practical developer problem: understanding Django ORM performance and security without manually searching through large documentation pages.
+Through this project, the following concepts are practiced:
 
-Instead of relying only on AI-generated explanations, the project aims to combine:
+- Backend application development using FastAPI
+- Python project management using UV
+- PostgreSQL database management
+- SQLAlchemy ORM
+- Database migrations using Alembic
+- JSONB storage and GIN indexing
+- Docker and Docker Compose
+- Automated unit testing with pytest
+- Code-quality checking with Ruff
+- CI/CD using GitHub Actions
+- Cloud deployment using Render
+- Deployment health checks
+- Database and deployment troubleshooting
 
-- Official documentation
-- Retrieval-based knowledge
-- Practical code examples
-- Executable demonstrations
-- SQL visibility
-- Query-count validation
+---
 
-The goal is to make answers not only understandable, but also verifiable.
+## Author
+
+**Manikandan A**
+
+GitHub: [mani-dev-25](https://github.com/mani-dev-25)
+
+Project Repository:
+
+[prince28-dev11-djangodesk](https://github.com/mani-dev-25/prince28-dev11-djangodesk)
 
 ---
 
 ## License
 
-This project is currently under development. A project license will be added when the repository licensing is finalized.
-
----
-
-**Built as a learning and engineering project focused on Python, backend development, databases, AI, and Retrieval-Augmented Generation (RAG).**
+This project is developed as part of a learning and development project. Please check the repository for licensing information.
