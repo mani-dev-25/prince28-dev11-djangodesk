@@ -1,0 +1,67 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Migrate, Deploy & Smoke Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.11.32"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Run database migrations
+        env:
+          APP_ENV: production
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: uv run alembic upgrade head
+
+      - name: Trigger Render deployment
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          curl --fail --silent --show-error \
+            -X POST "$RENDER_DEPLOY_HOOK"
+
+      - name: Wait for deployment and smoke test
+        env:
+          RENDER_APP_URL: ${{ secrets.RENDER_APP_URL }}
+        run: |
+          echo "Waiting for application deployment..."
+
+          for i in {1..30}; do
+            STATUS=$(curl -s -o /tmp/health.json -w "%{http_code}" "$RENDER_APP_URL/health" || true)
+
+            if [ "$STATUS" = "200" ]; then
+              echo "Smoke test passed!"
+              cat /tmp/health.json
+              exit 0
+            fi
+
+            echo "Attempt $i: HTTP $STATUS. Waiting 10 seconds..."
+            sleep 10
+          done
+
+          echo "Deployment health check failed!"
+          exit 1
