@@ -10,3 +10,7 @@ __pycache__/
 htmlcov/
 
 *.py[cod]
+
+data/raw/.measured.json
+
+data/raw/django-documentation/*.pdf
