@@ -152,3 +152,51 @@ The deployed application was tested successfully:
 - The number that surprised me most, and why (2 lines):
 
 ### One thing that went wrong today, and how I fixed it
+
+## D07 - Parsing and storing the corpus
+
+### Parsing results
+
+- Files processed: 20
+- Successfully parsed: 20
+- Failed: 0
+- Skipped: 0
+- Pages/chunks stored: 3305
+- Parser unit tests: 16 passed, 0 failed
+
+### Parser implementation
+
+- PDF: PyMuPDF text extraction, source page numbers, font-based heading detection.
+- HTML: Trafilatura extraction with table support.
+- Text, Markdown, RST and code files: text cleanup, heading detection and chunking.
+- Chunk size: approximately 3000 characters.
+- Heading hierarchy: headings are stored with parsed pages.
+
+### Bug found and fixed
+
+The HTML parser was receiving HTML content instead of the file path. This caused a FileNotFoundError because the HTML content was interpreted as a filename.
+
+Fixed the HTML parsing call to pass the file path to parse_html().
+
+### Database verification
+
+- Documents: 20
+- Pages: 3305
+- Parse failures: 0
+- Duplicate page records: 0
+
+### Idempotency test
+
+Ran the corpus parser again on the same 20 files. Existing documents and pages were updated instead of duplicated. Verified zero duplicate page records.
+
+### Issue during verification
+
+One run encountered a temporary PostgreSQL connection interruption while processing the PDF. The database connection was checked, and the parser was retried successfully. The final run processed all 20 files with zero failures.
+
+### What I learned
+
+- Parsing is different for PDFs, HTML and plain-text documents.
+- HTML content must be passed correctly to the parser.
+- Heading paths help preserve document structure.
+- Idempotent database storage prevents duplicate records when ingestion is rerun.
+- Parse failures should be recorded so failed files can be retried.
