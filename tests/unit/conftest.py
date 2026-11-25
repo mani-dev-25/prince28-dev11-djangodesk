@@ -1,9 +1,10 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from djangodesk.api.deps import check_db, get_repo
+from djangodesk.api.deps import check_db, get_gateway, get_repo, get_usage_repo
 from djangodesk.api.main import create_app
 from djangodesk.config import Settings
+from djangodesk.llm.gateway import FakeLLM, LLMGateway
 
 SAMPLE = [
     {
@@ -52,13 +53,33 @@ class FakeRepo:
         )
 
 
+class FakeUsage:
+    async def by_day(self, days=7):
+        return [
+            {
+                "day": "2026-11-25",
+                "calls": 3,
+                "errors": 1,
+                "fallbacks": 1,
+                "tokens_in": 300,
+                "tokens_out": 120,
+                "cost_inr": 0.0642,
+            }
+        ]
+
+
 @pytest.fixture
 def db_state():
     return {"up": True}
 
 
 @pytest.fixture
-def client(db_state):
+def llm():
+    return FakeLLM()
+
+
+@pytest.fixture
+def client(db_state, llm):
     settings = Settings(
         app_env="ci",
         database_url="postgresql://localhost:5432/unused",
@@ -69,6 +90,8 @@ def client(db_state):
 
     app.dependency_overrides[get_repo] = lambda: FakeRepo(SAMPLE)
     app.dependency_overrides[check_db] = lambda: db_state["up"]
+    app.dependency_overrides[get_gateway] = lambda: LLMGateway([llm])
+    app.dependency_overrides[get_usage_repo] = lambda: FakeUsage()
 
     with TestClient(app) as test_client:
         yield test_client

@@ -24,6 +24,9 @@ WORKDIR /app
 
 RUN groupadd --system app && useradd --system --gid app app && id app
 
+COPY --chown=app:app data ./data
+COPY --chown=app:app prompts ./prompts
+
 COPY --from=builder --chown=app:app /app /app
 
 ENV PATH="/app/.venv/bin:$PATH"
