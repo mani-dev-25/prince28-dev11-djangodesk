@@ -598,11 +598,11 @@ The script checks project files, repository configuration, tests, Docker, CI/CD 
 - [x] Render deployment
 - [x] Health check
 - [x] Smoke test
-- [ ] Perform rollback drill on Render
-- [ ] Verify roll-forward after rollback
-- [ ] Document rollback and roll-forward SHAs and timestamps
+- [x] Perform rollback drill on Render
+- [x] Verify roll-forward after rollback
+- [x] Document rollback and roll-forward SHAs and timestamps
 - [x] Add CI/CD badges to README
-- [ ] Complete Week 1 final self-check
+- [x] Complete Week 1 final self-check
 - [ ] Continue AI-assisted ORM analysis development
 - [ ] Build deeper ORM performance analysis features
 - [ ] Improve AI-based explanations and learning workflow
