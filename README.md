@@ -109,30 +109,30 @@ DjangoDesk aims to make ORM learning and analysis easier through an AI-assisted 
 
 ```text
                  Developer
-                     |
-                     v
-              GitHub Repository
-                     |
-                     v
-             GitHub Actions CI
-          -----------------------
-          |                     |
-       Testing                Linting
-          |                     |
-          -----------+-----------
-                     |
-                     v
-                CD Workflow
-                     |
-             Alembic Migration
-                     |
-                     v
-               Render Deploy
-                     |
-                     v
-             DjangoDesk FastAPI
-                     |
-                     v
+                    |
+                    v
+             GitHub Repository
+                    |
+                    v
+            GitHub Actions CI
+         -----------------------
+         |                     |
+      Testing                Linting
+         |                     |
+         -----------+-----------
+                    |
+                    v
+               CD Workflow
+                    |
+            Alembic Migration
+                    |
+                    v
+              Render Deploy
+                    |
+                    v
+            DjangoDesk FastAPI
+                    |
+                    v
              Neon PostgreSQL
 ```
 
@@ -562,7 +562,7 @@ Topics include:
 | Day 2 | Sample data and data-loading tasks | Completed |
 | Day 3 | PostgreSQL, migrations, indexing | Completed |
 | Day 4 | Docker, Compose and automated testing | Completed |
-| Day 5 | CI/CD and live deployment | Completed |
+| Day 5 | CI/CD, live deployment and rollback drill | In Progress |
 
 ---
 
@@ -598,6 +598,10 @@ The script checks project files, repository configuration, tests, Docker, CI/CD 
 - [x] Render deployment
 - [x] Health check
 - [x] Smoke test
+- [ ] Perform rollback drill on Render
+- [ ] Verify roll-forward after rollback
+- [ ] Document rollback and roll-forward SHAs and timestamps
+- [x] Add CI/CD badges to README
 - [ ] Complete Week 1 final self-check
 - [ ] Continue AI-assisted ORM analysis development
 - [ ] Build deeper ORM performance analysis features
