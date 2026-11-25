@@ -108,8 +108,36 @@ If a deployment fails:
 4. Roll back to that deployment.
 5. Verify `/health` returns HTTP 200.
 
-### Rollback drill
-A manual rollback procedure is documented. A full rollback drill was not performed yet.
+### Rollback drill — completed
+
+Performed a rollback and roll-forward drill on Render on November 25, 2026.
+
+| Action | Commit SHA | Time (IST) | Result |
+|---|---|---|---|
+| Original live deployment (Day 7) | `5136cba` | Before 12:17 PM | Live |
+| Rollback to Day 6 | `292a9c4` | 12:17:14 PM | Deploy succeeded |
+| Roll-forward to Day 7 | `5136cba` | 12:19:13 PM | Deploy succeeded |
+
+#### Rollback verification
+
+- Rollback triggered manually through the Render Dashboard.
+- Previous Day 6 deployment became Live.
+- `/health` endpoint was checked after rollback.
+- Health response returned `status: ok`.
+- Application: `djangodesk`
+- Environment: `production`
+
+#### Roll-forward verification
+
+- Latest deployment triggered manually through Render Dashboard.
+- Restored commit: `5136cba`.
+- Deployment status: Deploy succeeded — Live.
+- Deployment duration: 50.3 seconds.
+- Day 7 version was restored successfully.
+
+#### Result
+
+Rollback to the previous deployment and roll-forward to the latest deployment were both completed successfully.
 
 ### Lead time
 Lead time was not formally measured during Week 1.
