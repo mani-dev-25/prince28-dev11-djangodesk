@@ -228,3 +228,40 @@ One run encountered a temporary PostgreSQL connection interruption while process
 - Heading paths help preserve document structure.
 - Idempotent database storage prevents duplicate records when ingestion is rerun.
 - Parse failures should be recorded so failed files can be retried.
+
+### D08 · LLM gateway
+
+#### Models and first-question latency
+
+- Primary model observed in the successful streamed `ask.py` response: Gemini `gemini-3.6-flash` (the local `.env` sets `LLM_PRIMARY_MODEL=gemini-3.6-flash`; the code default is `gemini-3.8-flash`. Render may differ.
+- Fallback configured in this checkout: Groq `openai/gpt-oss-20b`.
+- Laptop, first question: ___ s; input/output tokens ___ / ___; estimated cost Rs ___; cold start included: ___
+- Awake live URL (`https://djangodesk.onrender.com`), first question: ___ s; input/output tokens ___ / ___; estimated cost Rs ___; checked at ___ IST
+
+#### English and Tamil token comparison
+
+Use the same question and prompt on both runs; fill in values from `/v1/chat` or its `done` SSE event.
+
+| Language | Question | Input tokens | Output tokens | Cost (INR) | Latency (ms) |
+|---|---|---:|---:|---:|---:|
+| English | ___ | ___ | ___ | ___ | ___ |
+| Tamil | ___ | ___ | ___ | ___ | ___ |
+
+#### Answers without documents
+
+- Question 6: ___
+- Invented or incorrect detail observed: ___
+- Off-topic question: declined / answered; observed response: ___
+
+#### Fallback and circuit breaker
+
+- Fallback observed: ___ (configured fallback: Groq `openai/gpt-oss-20b`; usage currently reports 4 fallback calls).
+- Circuit breaker: ___ (threshold is 3 consecutive provider failures; cooldown is 30 seconds; after cooldown one probe is allowed).
+
+#### Usage bill
+
+Verified directly against `public.llm_calls` for 2026-11-25: 15 model-call rows, 5 errors, 4 fallback rows, 2,033 input tokens, 1,693 output tokens, and 10 distinct request IDs with an `ok` row. The stored total is Rs 0.0325 (Rs 0.00325 per answered request), but this undercounts the bill: all six successful `gemini-3.6-flash` rows have zero cost because the model was missing from the price map. They used 1,073 input and 793 output tokens. At Google standard paid-tier rates through 2026-12-31 ($0.75/$3.75 per million tokens), the missing estimate is about Rs 0.358957; corrected total is about Rs 0.391448, or Rs 0.03914 per answered request. The gateway price map now includes `gemini-3.6-flash`; this code change affects new calls only. Existing rows remain underpriced until deliberately recalculated. This is a list-price estimate, not a provider invoice.
+
+#### One thing that went wrong today, and how I fixed it
+
+The Neon SQL Editor initially reported that `llm_calls` did not exist. I manually created the table and set `alembic_version` to `d60bed8b2c83`; `uv run alembic current` now reports `d60bed8b2c83 (head)` for the local configured `DATABASE_URL`. Still verify the SQL Editor is on the same Neon project, branch, database, and schema as the application: the local Alembic result alone does not prove the Render process uses that same target. Compare the table definition and indexes with the migration before relying on manually created schema.

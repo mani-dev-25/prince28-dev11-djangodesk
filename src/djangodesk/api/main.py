@@ -1,42 +1,46 @@
-"""The app factory: builds and wires the FastAPI app."""
+"""App factory: build a fully wired FastAPI app from settings."""
 
 import logging
-from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
 
 from djangodesk.api.errors import register_error_handlers
 from djangodesk.api.middleware import RequestContextMiddleware
-from djangodesk.api.routes import documents, health
+from djangodesk.api.routes import chat, documents, health
 from djangodesk.config import Settings, get_settings
+from djangodesk.db.llm_calls import make_recorder
 from djangodesk.db.session import make_engine, make_sessionmaker
+from djangodesk.llm.gateway import build_gateway
 from djangodesk.logging_setup import setup_logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("djangodesk")
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
+    setup_logging(settings.log_level)
+    engine = make_engine(settings)  # no connection is opened yet
 
     @asynccontextmanager
-    async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-        setup_logging(settings.log_level)
-
-        engine = make_engine(settings)
-        app.state.engine = engine
-        app.state.session_factory = make_sessionmaker(engine)
-
-        logger.info("app started", extra={"fields": {"env": settings.app_env}})
+    async def lifespan(app: FastAPI):
+        logger.info("starting", extra={"status": settings.app_env})
         yield
+        await engine.dispose()  # close every pooled connection on shutdown
 
-        await engine.dispose()
-        logger.info("app stopping")
+    app = FastAPI(title=settings.app_name, version="0.2.0", lifespan=lifespan)
+    app.state.settings = settings
+    app.state.engine = engine
+    app.state.sessionmaker = make_sessionmaker(engine)
+    app.state.system_prompt = chat.load_prompt(settings.prompts_dir)  # missing file: no start
+    app.state.gateway = build_gateway(settings, make_recorder(app.state.sessionmaker))
 
-    app = FastAPI(title=settings.app_name, lifespan=lifespan)
     app.add_middleware(RequestContextMiddleware)
     register_error_handlers(app)
+
+    v1 = APIRouter(prefix="/v1")
+    v1.include_router(chat.router)
     app.include_router(health.router)
     app.include_router(documents.router)
-
+    app.include_router(v1)
     return app
