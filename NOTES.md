@@ -265,3 +265,43 @@ Verified directly against `public.llm_calls` for 2026-11-25: 15 model-call rows,
 #### One thing that went wrong today, and how I fixed it
 
 The Neon SQL Editor initially reported that `llm_calls` did not exist. I manually created the table and set `alembic_version` to `d60bed8b2c83`; `uv run alembic current` now reports `d60bed8b2c83 (head)` for the local configured `DATABASE_URL`. Still verify the SQL Editor is on the same Neon project, branch, database, and schema as the application: the local Alembic result alone does not prove the Render process uses that same target. Compare the table definition and indexes with the migration before relying on manually created schema.
+
+## D09 · Prompt versions compared
+
+<!-- prompts:start -->
+
+| Prompt version | Correct | Accuracy | Invalid replies | Avg tokens in |
+|---|---|---|---|---|
+| classify_v1 | 16/20 | 80% | 0 | 61 |
+| classify_v2 | 18/20 | 90% | 0 | 268 |
+| classify_v4 | 20/20 | 100% | 0 | 282 |
+
+<!-- prompts:end -->
+Version 4 copies version 2 and clarifies that personal questions include the current status of a user's DjangoDesk account, order, or deployment. It scored 20/20 on this test set (version 2 scored 18/20); the run made 20 new model calls, with older results served from cache. Version 3 was skipped because its prompt still contains TODO.
+
+
+### D09 · Prompts and structured output
+
+- My best router prompt: classify_v4 with 20 / 20
+- What I changed in v4, and what happened to the score: Copied v2 and clarified that personal questions include the current status of a user's DjangoDesk account, order, or deployment. Score increased from 18/20 (v2) to 20/20 (v4) on this test set.
+- The question my best version still gets wrong (line, wanted, got), and why I think so: None on this 20-question run; v4 had no misses. This small test set does not guarantee perfect results on new questions.
+- A label in my test set that I changed after seeing the results (or "none"): none.
+- Input tokens per question: v1 61, best version 282. Is the extra accuracy worth it? On this test set, yes: accuracy rose from 80% to 100% for 221 more input tokens per question. I should check more questions before assuming the gain will generalize.
+
+### My contract (DocMeta)
+
+- Fields I kept from my project card: The project card is not present in this repo, so I cannot verify its exact field list. The current contract includes doc_kind, year, language, summary, topics, page, topic, django_version, api_name, and orm_method.
+- Fields I deleted, and why they make no sense per document: No deleted fields are recorded in the repo, so I have no evidence to name any.
+- The field I tightened, and how: topics must contain 1–6 short values; values are lowercased and duplicates removed. Short string values are trimmed and limited to 80 characters.
+
+### Extraction run
+
+- Prompt version: extract_v1 · documents: 0 ok, 0 repaired, 0 failed (of 20 parsed previously, per D07 notes)
+- Not finished? Why, and how many are left: The run reported pending=0, so there was no work for this prompt version. No documents remain pending according to that run.
+- Most common failure reason, and what I did about it: None observed; no documents were processed.
+- A record that was valid but wrong (document, field, what it said, what is true): None observed; no records were extracted in this run.
+- Cost at list price: Rs 0.0000 in total; per-document cost is not applicable because 0 documents were processed.
+
+### One thing that went wrong today, and how I fixed it
+
+The extraction run showed pending=0 instead of the expected five documents. The script skips documents already handled by the latest prompt version, extract_v1. I treated this as the extractor's resumable behavior; the run made no model calls and changed no document metadata.
