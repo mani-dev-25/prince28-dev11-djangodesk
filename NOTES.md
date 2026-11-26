@@ -200,6 +200,25 @@ The deployed application was tested successfully:
 - Chunk size: approximately 3000 characters.
 - Heading hierarchy: headings are stored with parsed pages.
 
+### Parser comparison: ten complex Django HTML pages
+
+I compared the current Trafilatura extraction (`include_tables=True`) with lxml text extraction scoped to each page's `<main id="main-content">`. These are all ten official-docs HTML pages in the local corpus, including its longest and most code-heavy pages. The figures below are extracted characters / chunks. Code coverage is the percentage of distinct tokens found in the page's `<pre>` and `<code>` blocks that also occur in the extracted text.
+
+| Django docs page | Trafilatura chars / chunks | lxml chars / chunks | Code token types retained (Trafilatura / lxml) |
+|---|---:|---:|---:|
+| cache | 50,899 / 19 | 50,430 / 17 | 100% / 100% |
+| default | 43,810 / 24 | 54,719 / 19 | 83% / 100% |
+| deployment | 1,351 / 1 | 2,327 / 1 | 43% / 100% |
+| forms | 27,268 / 17 | 28,741 / 10 | 97% / 100% |
+| http | 740 / 1 | 449 / 1 | 100% / 100% |
+| models | 49,390 / 29 | 51,004 / 18 | 96% / 100% |
+| queries | 50,509 / 22 | 62,637 / 21 | 93% / 100% |
+| settings | 88,469 / 31 | 103,349 / 35 | 94% / 100% |
+| testing | 1,467 / 1 | 1,777 / 1 | 100% / 100% |
+| tutorial01 | 9,519 / 4 | 9,709 / 4 | 100% / 100% |
+
+**Result:** lxml retained every measured code-token type in these pages; Trafilatura retained 91% on average, with the largest loss on the short deployment page. Trafilatura generally returned less text than lxml, which can reduce navigation or layout noise. This is a text/code comparison, not a full accuracy score. None of the ten pages has a literal HTML `<table>`, so this sample does not establish table preservation; `include_tables=True` remains enabled in the production HTML parser.
+
 ### Bug found and fixed
 
 The HTML parser was receiving HTML content instead of the file path. This caused a FileNotFoundError because the HTML content was interpreted as a filename.
