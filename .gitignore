@@ -14,3 +14,5 @@ htmlcov/
 data/raw/.measured.json
 
 data/raw/django-documentation/*.pdf
+
+eval/cache/
