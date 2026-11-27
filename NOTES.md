@@ -293,10 +293,11 @@ The Neon SQL Editor initially reported that `llm_calls` did not exist. I manuall
 |---|---|---|---|---|
 | classify_v1 | 16/20 | 80% | 0 | 61 |
 | classify_v2 | 18/20 | 90% | 0 | 268 |
+| classify_v3 | 19/20 | 95% | 0 | 395 |
 | classify_v4 | 20/20 | 100% | 0 | 282 |
 
 <!-- prompts:end -->
-Version 4 copies version 2 and clarifies that personal questions include the current status of a user's DjangoDesk account, order, or deployment. It scored 20/20 on this test set (version 2 scored 18/20); the run made 20 new model calls, with older results served from cache. Version 3 was skipped because its prompt still contains TODO.
+Version 4 copies version 2 and clarifies that personal questions include the current status of a user's DjangoDesk account, order, or deployment. It scored 20/20 on this test set (version 2 scored 18/20). Version 3's TODO examples were replaced with real examples; it scored 19/20, missing the password-reset email question (line 11, expected personal, got docs). The comparison made 20 new model calls for v3; v1, v2, and v4 results came from cache.
 
 
 ### D09 · Prompts and structured output
@@ -315,12 +316,12 @@ Version 4 copies version 2 and clarifies that personal questions include the cur
 
 ### Extraction run
 
-- Prompt version: extract_v1 · documents: 0 ok, 0 repaired, 0 failed (of 20 parsed previously, per D07 notes)
-- Not finished? Why, and how many are left: The run reported pending=0, so there was no work for this prompt version. No documents remain pending according to that run.
-- Most common failure reason, and what I did about it: None observed; no documents were processed.
-- A record that was valid but wrong (document, field, what it said, what is true): None observed; no records were extracted in this run.
-- Cost at list price: Rs 0.0000 in total; per-document cost is not applicable because 0 documents were processed.
+- Prompt version: extract_v1 ? **20 ok, 0 repaired, 0 failed of 20 parsed Django documents** (10 HTML, 1 PDF, 9 text documents in Neon).
+- Not finished? Why, and how many are left: Finished; 20 of 20 parsed documents have extraction metadata, with 0 remaining.
+- Most common failure reason, and what I did about it: No document extraction failures. Provider quota/rate-limit errors interrupted early attempts; extraction resumed at 3 documents/minute with a 2,500-character input limit and completed.
+- A record that was valid but wrong (document, field, what it said, what is true): Not manually audited yet.
+- Cost recorded for successful extraction calls: Rs 0.842907 total (about Rs 0.0421 per parsed document); 41,459 input and 19,211 output tokens. The provider also logged 22 failed call attempts with no recorded cost.
 
 ### One thing that went wrong today, and how I fixed it
 
-The extraction run showed pending=0 instead of the expected five documents. The script skips documents already handled by the latest prompt version, extract_v1. I treated this as the extractor's resumable behavior; the run made no model calls and changed no document metadata.
+Neon initially contained 20 sample records and no parsed Django documents, so extraction correctly found nothing to process. I parsed the first 20 corpus manifest entries (20 documents) into Neon, then ran extraction. Provider quotas interrupted the first attempts; lowering the rate and input size let the resumable run finish all 20 documents. I also replaced the TODO examples in classify_v3 and reran the prompt comparison.
