@@ -44,17 +44,36 @@ services:
     command: uvicorn djangodesk.api.main:create_app --factory --host 0.0.0.0 --port 8000
     ports:
       - "8000:8000"
-    environment:
+    environment: &app-env
       DATABASE_URL: ${DOCKER_DATABASE_URL:?Set DOCKER_DATABASE_URL in .env}
+      REDIS_URL: redis://redis:6379
       APP_NAME: djangodesk
       APP_ENV: local
       LOG_LEVEL: INFO
       DATA_FILE: data/sample_records.json
+    env_file: &keys
+      - path: .env
+        required: false
     depends_on:
       migrate:
         condition: service_completed_successfully
       redis:
         condition: service_healthy
+
+  worker:
+    build: .
+    command: ["arq", "djangodesk.workers.main.WorkerSettings"]
+    environment: *app-env
+    env_file: *keys
+    volumes:
+      - ./data/raw:/app/data/raw:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
 
 volumes:
   postgres_data:

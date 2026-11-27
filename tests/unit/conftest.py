@@ -1,7 +1,15 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from djangodesk.api.deps import check_db, get_gateway, get_repo, get_usage_repo
+from djangodesk.api.deps import (
+    check_db,
+    get_gateway,
+    get_ingest_repo,
+    get_manifest,
+    get_queue,
+    get_repo,
+    get_usage_repo,
+)
 from djangodesk.api.main import create_app
 from djangodesk.config import Settings
 from djangodesk.llm.gateway import FakeLLM, LLMGateway
@@ -79,10 +87,11 @@ def llm():
 
 
 @pytest.fixture
-def client(db_state, llm):
+def client(db_state, llm, queue, ingest_repo):
     settings = Settings(
         app_env="ci",
         database_url="postgresql://localhost:5432/unused",
+        admin_token="test-token",
         _env_file=None,
     )
 
@@ -92,8 +101,24 @@ def client(db_state, llm):
     app.dependency_overrides[check_db] = lambda: db_state["up"]
     app.dependency_overrides[get_gateway] = lambda: LLMGateway([llm])
     app.dependency_overrides[get_usage_repo] = lambda: FakeUsage()
+    app.dependency_overrides[get_queue] = lambda: queue
+    app.dependency_overrides[get_ingest_repo] = lambda: ingest_repo
+    app.dependency_overrides[get_manifest] = lambda: MANIFEST
 
     with TestClient(app) as test_client:
         yield test_client
 
     app.dependency_overrides.clear()
+
+
+MANIFEST = [
+    {
+        "url": f"https://x.test/{number}.pdf",
+        "source": "x",
+        "licence": "CC BY 4.0",
+        "path": f"data/raw/x/{number}.pdf",
+        "sha256": str(number) * 64,
+        "status": "downloaded",
+    }
+    for number in (1, 2)
+]

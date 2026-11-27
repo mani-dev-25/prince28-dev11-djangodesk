@@ -7,7 +7,7 @@ from fastapi import APIRouter, HTTPException, Query, Request
 from djangodesk.api.deps import RepoDep
 from djangodesk.db.repository import FILTER_KEY
 
-router = APIRouter(prefix="/v1/documents", tags=["documents"])
+router = APIRouter(prefix="/documents", tags=["documents"])
 
 
 @router.get("")

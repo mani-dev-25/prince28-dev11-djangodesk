@@ -325,3 +325,35 @@ Version 4 copies version 2 and clarifies that personal questions include the cur
 ### One thing that went wrong today, and how I fixed it
 
 Neon initially contained 20 sample records and no parsed Django documents, so extraction correctly found nothing to process. I parsed the first 20 corpus manifest entries (20 documents) into Neon, then ran extraction. Provider quotas interrupted the first attempts; lowering the rate and input size let the resumable run finish all 20 documents. I also replaced the TODO examples in classify_v3 and reran the prompt comparison.
+
+
+### D10 · Queue and worker
+
+- First run: ___ documents queued, finished in ___ s. Done ___ , skipped ___ , failed ___
+- Pace: ___ s per document (INGEST_RPM = ___ , INGEST_CONCURRENCY = ___ )
+
+### Kill test
+
+- Queued: 20. At the kill: queued ___ , running ___ , done ___ , failed ___
+- After the new worker: done ___ + skipped ___ + failed ___ = ___ (must be 20)
+- Documents in the database: ___ , different ids: ___ (must be equal)
+- The interrupted items came back after ___ s. Why that long:
+- Why nothing was doubled (one sentence, in my own words):
+
+### Dead-letter list
+
+| Stage (parse / extract / download / gave up) | Items | What I did |
+|---|---|---|
+| | | |
+
+### Live ingestion
+
+- DjangoDesk on Render: ___ of 5 documents done, ___ failed. The reasons:
+- A request without the token gets status ___
+
+### Week 2 against Monday's estimate
+
+- docs/CAPACITY.md said: ___ pages, ___ tokens. docs/INGEST_REPORT.md says: ___ pages, ___ tokens
+- The difference, and why:
+
+### One thing that went wrong today, and how I fixed it
