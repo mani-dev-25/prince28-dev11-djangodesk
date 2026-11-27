@@ -121,8 +121,11 @@ async def process(ctx: dict, session: AsyncSession, item: IngestItem) -> tuple[s
                 parsed = await asyncio.to_thread(parse_document, path)
             except ParseError as error:
                 await save_failure(session, record, error)
+                # Retain the dead-letter fingerprint across the outer rollback.
+                await session.commit()
                 raise Permanent(f"parse: {error.reason}") from error
             await save_document(session, record, parsed)
+            await session.commit()  # keep parsed pages if later extraction needs a retry
             document = await session.scalar(select(Document).where(Document.external_id == doc_id))
             status = "done"
     pages = int(document.metadata_.get("pages", 0))

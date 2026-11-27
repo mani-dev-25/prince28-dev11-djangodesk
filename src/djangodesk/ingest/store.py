@@ -139,7 +139,12 @@ async def save_document(
 
     path = str(record.get("path") or "")
     suffix = path.rsplit(".", 1)[-1].lower() if "." in path else "record"
-    title = str(record.get("title") or path.rsplit("/", 1)[-1].rsplit("\\", 1)[-1] or path)
+    first_heading = next(
+        (heading.strip() for page in pages for heading in page.headings if heading.strip()),
+        "",
+    )
+    filename = path.rsplit("/", 1)[-1].rsplit("\\", 1)[-1]
+    title = str(record.get("title") or first_heading or filename or path)
     document = Document(
         external_id=document_id(str(record["sha256"])),
         title=title,
