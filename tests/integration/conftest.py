@@ -59,3 +59,9 @@ def test_database():
         yield env["DATABASE_URL"]
     finally:
         asyncio.run(drop_database())
+
+
+@pytest.fixture
+def database_url(test_database):
+    """URL of the isolated database created for integration tests."""
+    return test_database

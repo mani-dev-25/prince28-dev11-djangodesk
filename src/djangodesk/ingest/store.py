@@ -11,7 +11,7 @@ from sqlalchemy import delete
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from djangodesk.db.models import Page, ParseFailure
+from djangodesk.db.models import Document, Page, ParseFailure
 
 
 def _page_values(document_id: int, parsed_page: Any) -> dict[str, Any]:
@@ -120,3 +120,63 @@ async def save_document_pages(
     count = await save_pages(session, document_id, parsed_pages)
     await clear_parse_failure(session, path)
     return count
+
+
+def document_id(sha256: str) -> str:
+    """Stable document key based on content, independent of its URL or filename."""
+    return "f-" + sha256[:20]
+
+
+async def save_document(
+    session: AsyncSession,
+    record: dict[str, Any],
+    parsed_pages: Iterable[Any],
+) -> Document:
+    """Create a parsed document and its pages in the caller's transaction."""
+    pages = list(parsed_pages)
+    if not pages:
+        raise ValueError("Refusing to store an empty parse result")
+
+    path = str(record.get("path") or "")
+    suffix = path.rsplit(".", 1)[-1].lower() if "." in path else "record"
+    title = str(record.get("title") or path.rsplit("/", 1)[-1].rsplit("\\", 1)[-1] or path)
+    document = Document(
+        external_id=document_id(str(record["sha256"])),
+        title=title,
+        source_url=record.get("url"),
+        licence=record.get("licence"),
+        doc_type=suffix,
+        published_on=None,
+        sha256=str(record["sha256"]),
+        metadata_={
+            "source": record.get("source"),
+            "path": path,
+            "parser": (
+                "pymupdf"
+                if suffix == "pdf"
+                else "trafilatura"
+                if suffix in {"html", "htm"}
+                else "text"
+            ),
+            "pages": len(pages),
+            "tables": False,
+            "chars": sum(len(page.text) for page in pages),
+        },
+    )
+    session.add(document)
+    await session.flush()
+    await save_pages(session, document.id, pages)
+    await clear_parse_failure(session, path)
+    return document
+
+
+async def save_failure(session: AsyncSession, record: dict[str, Any], error: Exception) -> None:
+    """Record a permanent parse failure so this content is not queued repeatedly."""
+    await record_parse_failure(
+        session,
+        path=str(record.get("path") or record.get("url") or record["sha256"]),
+        sha256=str(record["sha256"]),
+        source_url=record.get("url"),
+        reason=str(getattr(error, "reason", "parse_error"))[:40],
+        detail=str(error),
+    )

@@ -24,6 +24,14 @@ SUPPORTED_EXTENSIONS = {
 }
 
 
+class ParseError(Exception):
+    """A permanent error in a source document that should not be retried."""
+
+    def __init__(self, reason: str, detail: str = "") -> None:
+        self.reason = reason
+        super().__init__(detail or reason)
+
+
 @dataclass
 class ParsedPage:
     page_no: int
@@ -208,12 +216,12 @@ def parse_text(content: str, chunk_size: int = CHUNK_SIZE) -> list[ParsedPage]:
 def parse_file(path: Path) -> list[ParsedPage]:
     path = Path(path)
     if not path.exists():
-        raise FileNotFoundError(path)
+        raise ParseError("missing_file", str(path))
     if not path.is_file():
-        raise ValueError(f"Not a file: {path}")
+        raise ParseError("not_a_file", f"Not a file: {path}")
     suffix = path.suffix.lower()
     if suffix not in SUPPORTED_EXTENSIONS:
-        raise ValueError(f"Unsupported file type: {suffix}")
+        raise ParseError("unsupported_type", f"Unsupported file type: {suffix}")
     content = path.read_text(encoding="utf-8", errors="replace")
     return parse_text(content)
 
@@ -231,7 +239,7 @@ def parse_html(path: Path) -> list[ParsedPage]:
         output_format="txt",
     )
     if not extracted:
-        raise ValueError("No readable content extracted from HTML")
+        raise ParseError("empty_html", "No readable content extracted from HTML")
     return parse_text(extracted)
 
 
@@ -240,7 +248,10 @@ def parse_pdf(path: Path) -> list[ParsedPage]:
     import pymupdf
 
     path = Path(path)
-    document = pymupdf.open(path)
+    try:
+        document = pymupdf.open(path)
+    except (pymupdf.FileDataError, ValueError, OSError) as error:
+        raise ParseError("invalid_pdf", str(error)) from error
     parsed_pages = []
 
     try:
@@ -310,10 +321,15 @@ def parse_pdf(path: Path) -> list[ParsedPage]:
 
 
 def parse_document(path: Path) -> list[ParsedPage]:
+    """Parse a supported source format and report permanent document errors consistently."""
     path = Path(path)
     suffix = path.suffix.lower()
     if suffix == ".pdf":
-        return parse_pdf(path)
-    if suffix in {".html", ".htm"}:
-        return parse_html(path)
-    return parse_file(path)
+        pages = parse_pdf(path)
+    elif suffix in {".html", ".htm"}:
+        pages = parse_html(path)
+    else:
+        pages = parse_file(path)
+    if not pages:
+        raise ParseError("empty_document", "No readable text found in document")
+    return pages
